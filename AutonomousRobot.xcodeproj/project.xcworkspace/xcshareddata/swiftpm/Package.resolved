@@ -1,0 +1,16 @@
+{
+  "object": {
+    "pins": [
+      {
+        "package": "SwiftMindstorms",
+        "repositoryURL": "https://github.com/lukevanin/swift-mindstorms.git",
+        "state": {
+          "branch": "main",
+          "revision": "189f0004c5862f87127bc67ea74343464a941b87",
+          "version": null
+        }
+      }
+    ]
+  },
+  "version": 1
+}
