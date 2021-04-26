@@ -10,13 +10,15 @@ import Combine
 import simd
 
 
-private let waypointDistanceThreshold = Float(0.250)
-private let pathDistanceThreshold = Float(0.500)
-
-
 ///
-/// Moves the robot from its current location on a given map towards a given goal. Stops when there is no
-/// route to the goal, or when the goal is reached.
+/// Computes the trajectory from the robot's current location to the next waypoint along the path. The
+/// trajectory is the straight-line direction and distance that the robot should move. Produces a nil trajectory if
+/// there is no route, or if the robot is within sufficient distance of the last waypoint.
+///
+/// Waypoints are provided by the path finding algorithm which calculates the route through the environment.
+///
+/// The trajectory is used by the robot controller to determine steering and speed commands which actually
+/// move the robot.
 ///
 final class Navigator {
     
@@ -38,17 +40,24 @@ final class Navigator {
     ) {
         Publishers
             .CombineLatest(agent, waypoints)
-//            .throttle(for: 1.0, scheduler: queue, latest: true)
             .receive(on: queue)
             .map { agent, waypoints -> Trajectory? in
+                // Check if the robot has reached the last waypoint. The first
+                // waypoint is always the robot's current position. The next
+                // waypoint starts at index 1.
                 guard waypoints.count > 1 else {
                     return nil
                 }
                 
+                // Iterate through all of the waypoints. Ignore waypoints that
+                // are too close (ie the robot might already at a waypoint so we
+                // don't need to drive towards it).
                 for i in 1 ..< waypoints.count {
                     let waypoint = waypoints[i]
                 
-                    // Calculate the relative offset to the waypoint.
+                    // Calculate the relative straight-line distance from the
+                    // robot to the waypoint to check if the robot is already
+                    // "at" the waypoint.
                     let delta = waypoint - agent.position
                     let distance = delta.length()
                     
@@ -58,7 +67,8 @@ final class Navigator {
                     }
                     
                     // Calculate total remaining distance along the path to the
-                    // goal.
+                    // goal. If we are close enough to the final goal then we
+                    // don't need to compute a trajectory.
                     var remainingDistance = Float(0)
                     for j in i ..< waypoints.count {
                         let w0 = waypoints[j - 1]
@@ -67,35 +77,23 @@ final class Navigator {
                         remainingDistance += distance
                     }
                     guard remainingDistance > pathDistanceThreshold else {
-                        // We are close enough to the goal. Stop here.
+                        // We are "at" the goal.
                         break
                     }
                     
-                    // Calculate the relative angle between the agent's heading, and
-                    // the waypoint.
-                    // See: https://stackoverflow.com/a/21486462
-                    let heading: Float = {
-                        let a = simd_normalize(
-                            simd_float2(
-                                cos(agent.heading),
-                                sin(agent.heading)
-                            )
-                        )
-                        let b = simd_normalize(
-                            simd_float2(
-                                delta.x,
-                                delta.y
-                            )
-                        )
-                        let cross = simd_orient(a, b)
-                        let dot = simd_dot(a, b)
-                        let angle = atan2(cross, dot)
-                        // print("Angle", String(format: "%0.2f", angle))
-                        return Float(angle)
-                    }()
+                    // Calculate the relative angle between the agent's heading,
+                    // and the waypoint so that we know how much more we need to
+                    // turn to face towards the waypoint.
+                    let agentVector = simd_float2(
+                        cos(agent.heading),
+                        sin(agent.heading)
+                    )
+                    let heading = agentVector.angle(
+                        to: simd_float2(delta.x, delta.y)
+                    )
                     return Trajectory(
-                        heading: Measurement<UnitAngle>(value: Double(heading), unit: .radians),
-                        distance: Measurement<UnitLength>(value: Double(distance), unit: .meters)
+                        heading: Measurement(value: Double(heading), unit: .radians),
+                        distance: Measurement(value: Double(distance), unit: .meters)
                     )
                 }
                 return nil

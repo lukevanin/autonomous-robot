@@ -11,24 +11,10 @@ import Combine
 import SwiftMindstorms
 
 
-private let headingThreshold = Measurement<UnitAngle>(value: 7, unit: .degrees)
-private let decelerationDistance = Measurement<UnitLength>(value: 1000, unit: .millimeters)
-private let headingDamping = Float(0.2)
-
-
-private let angleFormatter: MeasurementFormatter = {
-    let formatter = MeasurementFormatter()
-    return formatter
-}()
-
-
-private let distanceFormatter: MeasurementFormatter = {
-    let formatter = MeasurementFormatter()
-    formatter.unitOptions = .naturalScale
-    return formatter
-}()
-
-
+///
+/// Sends commands to the robot to steer and move the robot toward a given trajectory. Stops the robot when
+/// the robot is when no trajectory is given.
+///
 final class Controller {
     
     struct Configuration {
@@ -44,19 +30,18 @@ final class Controller {
     }
     
     fileprivate var configuration: Configuration = Configuration(
-        moveSpeed: 30,
-        turnSpeed: 10,
-        lhsMotorPort: .A,
-        rhsMotorPort: .E
+        moveSpeed: maximumMovementSpeed,
+        turnSpeed: minimumMovementSpeed,
+        lhsMotorPort: lhsMotorPort,
+        rhsMotorPort: rhsMotorPort
     )
     
     var enabled: Bool = false
     
     private var trajectory: Trajectory = .zero
     private var headingPID = PID(
-//        kp: 0.1,
-        kp: 0.2,
-        ki: 0.01
+        kp: controllerProportional,
+        ki: controllerIntegral
     )
     private var motorSpeed: MotorSpeed = MotorSpeed(lhs: 0, rhs: 0)
 
@@ -66,8 +51,6 @@ final class Controller {
     private var cancellables = Set<AnyCancellable>()
     fileprivate let robot: Robot
 
-    #warning("TODO: Use a kalman filter to compensate for heading and movement")
-    
     init(
         trajectory: AnyPublisher<Trajectory?, Never>,
         robot: Robot
@@ -82,7 +65,7 @@ final class Controller {
                 self.update(trajectory: trajectory)
             }
             .store(in: &cancellables)
-        updateTimer = Timer.scheduledTimer(withTimeInterval: 0.1, repeats: true) { [weak self] _ in
+        updateTimer = Timer.scheduledTimer(withTimeInterval: commandUpdateInterval, repeats: true) { [weak self] _ in
             DispatchQueue.main.async {
                 guard let self = self else {
                     return
@@ -124,9 +107,7 @@ final class Controller {
         // +0.5 ... +1 = Left wheel turns forward. Right wheel turns backwards.
         let lhsSpeed: Float
         let rhsSpeed: Float
-//        let delta = currentHeading / (.pi * 0.5)
         let delta = headingPID.controlVariable / (.pi * 0.5)
-//        let delta = headingPID.controlVariable / .pi
         let compensation = 1 - (abs(delta) * 2)
         if delta > 0 {
             // Turning right
@@ -166,8 +147,6 @@ final class Controller {
         let lhsOutputSpeed = speed * lhsSpeed
         let rhsOutputSpeed = speed * rhsSpeed
         
-//        motorSpeed.lhs = motorSpeed.lhs + ((lhsOutputSpeed - motorSpeed.lhs) * motorAcceleration)
-//        motorSpeed.rhs = motorSpeed.rhs + ((rhsOutputSpeed - motorSpeed.rhs) * motorAcceleration)
         motorSpeed.lhs = lhsOutputSpeed
         motorSpeed.rhs = rhsOutputSpeed
  
@@ -218,12 +197,6 @@ final class Controller {
             request: request,
             completion: { _ in }
         )
-        DispatchQueue.main.asyncAfter(wallDeadline: .now() + 0.1) { [weak self] in
-            dispatchPrecondition(condition: .onQueue(.main))
-            guard let self = self else {
-                return
-            }
-            self.sendingCommand = false
-        }
+        self.sendingCommand = false
     }
 }

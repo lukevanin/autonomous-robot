@@ -10,17 +10,59 @@ import ARKit
 import simd
 
 
+///
+/// Direction of the sky or ceiling relative to the ground. ARKit defines the positive Y-axis as "up".
+///
 private let upVector = simd_float3(0, 1, 0)
 
 
+///
+/// Represents the position and radius of a disc which circumscribes the coordinates of a triangle projected
+/// onto a 2D plane. The disc is rendered into an occupancy grid to indicate the approximate position and size
+/// of a triangle.
+///
 struct Blob: Hashable {
     var center: SIMD4<Float>
     var radius: Float
 }
 
 
+///
+/// Approximation of a 3D mesh represented as a point cloud. Each face in the mesh is represented by disc
+/// circumscribing the coordinates of the face projected onto a 2D plane. Used to render a 2D _height map_
+/// representative of the mesh, which is then used to produce an occupancy grid describing the obstacles and
+/// navigable space in the world.
+///
+class Field {
+
+    fileprivate(set) var hash: Int
+    fileprivate(set) var count: Int
+    fileprivate(set) var bounds: Volume
+    fileprivate(set) var transform: simd_float4x4
+    fileprivate var buffer: PoolObject<FlexibleBuffer<Blob>>
+    
+    init(buffer: PoolObject<FlexibleBuffer<Blob>>) {
+        self.buffer = buffer
+        self.bounds = .undefined
+        self.count = 0
+        self.hash = 0
+        self.transform = matrix_identity_float4x4
+    }
+    
+    subscript(index: Int) -> Blob {
+        precondition(index >= 0)
+        precondition(index < buffer.subject.capacity)
+        return buffer.subject[index]
+    }
+}
+
+
 extension Field {
     
+    ///
+    /// Convenience method used to initialize a field (point cloud) from an _ARMeshAnchor_. Each
+    /// triangle is approximated by a disc. Computes the bounding volume of the resulting point cloud.
+    ///
     convenience init(anchor: ARMeshAnchor, buffer: PoolObject<FlexibleBuffer<Blob>>) {
         precondition(anchor.geometry.faces.bytesPerIndex == MemoryLayout<UInt32>.size, "Expected one UInt32 (four bytes) per vertex index")
         precondition(anchor.geometry.vertices.format == MTLVertexFormat.float3, "Expected three floats (twelve bytes) per vertex.")
@@ -43,7 +85,6 @@ extension Field {
             return
         }
 
-//        count = faceCount
         // Allocate enough space for all the faces (even though we might discard some).
         if faceCount > blobs.capacity {
             blobs.reallocate(capacity: faceCount)
@@ -116,29 +157,5 @@ extension Field {
         }
         self.bounds = bounds
         self.count = count
-    }
-}
-
-
-class Field {
-
-    fileprivate(set) var hash: Int
-    fileprivate(set) var count: Int
-    fileprivate(set) var bounds: Volume
-    fileprivate(set) var transform: simd_float4x4
-    fileprivate var buffer: PoolObject<FlexibleBuffer<Blob>>
-    
-    init(buffer: PoolObject<FlexibleBuffer<Blob>>) {
-        self.buffer = buffer
-        self.bounds = .undefined
-        self.count = 0
-        self.hash = 0
-        self.transform = matrix_identity_float4x4
-    }
-    
-    subscript(index: Int) -> Blob {
-        precondition(index >= 0)
-        precondition(index < buffer.subject.capacity)
-        return buffer.subject[index]
     }
 }

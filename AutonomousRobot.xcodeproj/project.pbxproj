@@ -32,6 +32,7 @@
 		FC596B782635B1240096D76A /* PID.swift in Sources */ = {isa = PBXBuildFile; fileRef = FC596B772635B1240096D76A /* PID.swift */; };
 		FC596B802635B1EB0096D76A /* README.md in Resources */ = {isa = PBXBuildFile; fileRef = FC596B7F2635B1EB0096D76A /* README.md */; };
 		FC596B862636F5CC0096D76A /* Geometry.swift in Sources */ = {isa = PBXBuildFile; fileRef = FC596B852636F5CC0096D76A /* Geometry.swift */; };
+		FC596B8A2636F6D10096D76A /* Constants.swift in Sources */ = {isa = PBXBuildFile; fileRef = FC596B892636F6D10096D76A /* Constants.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -61,6 +62,7 @@
 		FC596B772635B1240096D76A /* PID.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PID.swift; sourceTree = "<group>"; };
 		FC596B7F2635B1EB0096D76A /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
 		FC596B852636F5CC0096D76A /* Geometry.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Geometry.swift; sourceTree = "<group>"; };
+		FC596B892636F6D10096D76A /* Constants.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Constants.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -75,6 +77,25 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		FC300AEA2636FEE400FE27A8 /* Types */ = {
+			isa = PBXGroup;
+			children = (
+				FC596B4F2635AFC50096D76A /* Types.swift */,
+				FC596B422635AFC40096D76A /* Map.swift */,
+				FC596B512635AFC50096D76A /* Field.swift */,
+			);
+			path = Types;
+			sourceTree = "<group>";
+		};
+		FC300AEE2637094F00FE27A8 /* Utilities */ = {
+			isa = PBXGroup;
+			children = (
+				FC596B432635AFC40096D76A /* PathFinder.swift */,
+				FC596B492635AFC40096D76A /* MapBuilder.swift */,
+			);
+			path = Utilities;
+			sourceTree = "<group>";
+		};
 		FC596B1F2635AEAA0096D76A = {
 			isa = PBXGroup;
 			children = (
@@ -96,7 +117,9 @@
 			isa = PBXGroup;
 			children = (
 				FC596B7B2635B15C0096D76A /* App */,
-				FC596B7C2635B1800096D76A /* Utilities */,
+				FC300AEE2637094F00FE27A8 /* Utilities */,
+				FC300AEA2636FEE400FE27A8 /* Types */,
+				FC596B7C2635B1800096D76A /* Framework */,
 				FC596B7A2635B14D0096D76A /* Resources */,
 				FC596B392635AEAB0096D76A /* Info.plist */,
 			);
@@ -115,36 +138,32 @@
 		FC596B7B2635B15C0096D76A /* App */ = {
 			isa = PBXGroup;
 			children = (
+				FC596B892636F6D10096D76A /* Constants.swift */,
 				FC596B462635AFC40096D76A /* AppDelegate.swift */,
 				FC596B552635AFC50096D76A /* ViewController.swift */,
+				FC596B4C2635AFC50096D76A /* Renderer.swift */,
 				FC596B4A2635AFC50096D76A /* Navigator.swift */,
 				FC596B482635AFC40096D76A /* Controller.swift */,
-				FC596B512635AFC50096D76A /* Field.swift */,
-				FC596B422635AFC40096D76A /* Map.swift */,
-				FC596B492635AFC40096D76A /* MapBuilder.swift */,
-				FC596B502635AFC50096D76A /* Mapper.swift */,
-				FC596B432635AFC40096D76A /* PathFinder.swift */,
-				FC596B4C2635AFC50096D76A /* Renderer.swift */,
 				FC596B562635AFC50096D76A /* Router.swift */,
+				FC596B502635AFC50096D76A /* Mapper.swift */,
 				FC596B542635AFC50096D76A /* Scanner.swift */,
-				FC596B4F2635AFC50096D76A /* Types.swift */,
 			);
 			path = App;
 			sourceTree = "<group>";
 		};
-		FC596B7C2635B1800096D76A /* Utilities */ = {
+		FC596B7C2635B1800096D76A /* Framework */ = {
 			isa = PBXGroup;
 			children = (
+				FC596B772635B1240096D76A /* PID.swift */,
 				FC596B4D2635AFC50096D76A /* BufferPool.swift */,
 				FC596B4E2635AFC50096D76A /* FlexibleBuffer.swift */,
 				FC596B4B2635AFC50096D76A /* Pool.swift */,
-				FC596B572635AFC50096D76A /* SIMDExtensions.swift */,
-				FC596B772635B1240096D76A /* PID.swift */,
-				FC596B522635AFC50096D76A /* Mutex.swift */,
 				FC596B442635AFC40096D76A /* Volume.swift */,
 				FC596B852636F5CC0096D76A /* Geometry.swift */,
+				FC596B572635AFC50096D76A /* SIMDExtensions.swift */,
+				FC596B522635AFC50096D76A /* Mutex.swift */,
 			);
-			path = Utilities;
+			path = Framework;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -225,6 +244,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				FC596B6D2635AFC50096D76A /* Router.swift in Sources */,
+				FC596B8A2636F6D10096D76A /* Constants.swift in Sources */,
 				FC596B652635AFC50096D76A /* FlexibleBuffer.swift in Sources */,
 				FC596B682635AFC50096D76A /* Field.swift in Sources */,
 				FC596B862636F5CC0096D76A /* Geometry.swift in Sources */,

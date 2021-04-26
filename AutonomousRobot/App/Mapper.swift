@@ -9,20 +9,12 @@ import ARKit
 import Combine
 
 
-private let mapResolution = Float(0.050) // resolution in meters (size of smallest unit in the map)
 private let mapScale = Float(1) / mapResolution
-//private let roofThreshold = Float(2.000)
-//private let floorThreshold = Float(0.250)
-//private let floorThreshold = Float(1.000)
 
 
-//private class MapFactory {
-//
-//    private var mapBuilder: MapBuilder!
-//
-//}
-
-
+///
+/// Updates the map when the mesh is updated by ARKit
+///
 final class Mapper {
 
     let image = CurrentValueSubject<CGImage?, Never>(nil)
@@ -49,10 +41,9 @@ final class Mapper {
         agent: AnyPublisher<Agent?, Never>,
         fields: AnyPublisher<[UUID : Field], Never>
     ) {
+        #warning("TODO: Only update when fields are updated")
         Publishers
             .CombineLatest(agent, fields)
-//            .debounce(for: 0.1, scheduler: queue)
-//            .throttle(for: 0.0, scheduler: DispatchQueue.main, latest: true)
             .receive(on: DispatchQueue.main)
             .sink { [weak self] (agent: Agent?, fields: Fields) -> Void in
                 guard let self = self else {
@@ -104,13 +95,6 @@ final class Mapper {
             return
         }
         
-//        let mapAgent = MapBuilder.Agent(
-//            location: agent.position,
-//            elevation: agent.elevation,
-//            radius: agent.radius,
-//            orientation: agent.heading
-//        )
-
         // Find extents and origin of the world.
         var hasField = false
         var worldMin = simd_float3(+Float.greatestFiniteMagnitude, +Float.greatestFiniteMagnitude, +Float.greatestFiniteMagnitude)
@@ -146,10 +130,11 @@ final class Mapper {
         }
         
         guard hasField else {
+            // We do not have any mesh data yet to be able to produce a map.
             return
         }
         
-        
+        // Set up the transformation to convert between the world and map space.
         var mapCoordinateSpace = MapCoordinateSpace(
             worldOrigin: WorldCoordinate(x: worldMin.x, y: worldMin.z),
             worldOrientation: -agent.heading,
@@ -161,6 +146,7 @@ final class Mapper {
         )
 
         // Calculate map boundaries
+        #warning("TODO: Compute world boundaries above with map boundaries (used to be needed here because the map was rotated)")
         let worldBoundaryCoordinates = [
             WorldCoordinate(x: worldMin.x, y: worldMin.z),
             WorldCoordinate(x: worldMin.x, y: worldMax.z),
@@ -190,6 +176,7 @@ final class Mapper {
         mapDimensions.y = max(mapDimensions.y, mapSize.y)
 
         if mapBuilder?.dimensions != mapDimensions {
+            // The map has changed size. Recreate the map from scratch.
             mapBuilder = MapBuilder(
                 dimensions: mapDimensions,
                 space: mapCoordinateSpace,

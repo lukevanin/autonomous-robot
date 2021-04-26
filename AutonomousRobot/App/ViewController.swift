@@ -13,12 +13,6 @@ import Combine
 import SwiftMindstorms
 
 
-private let agentCameraElevation = Float(0.350)
-private let agentCameraOffset = Float(0.100)
-private let agentRadius = Float(0.150)
-private let torchEnabled = false
-
-
 func makeMeshMaterial(color: UIColor) -> SCNMaterial {
     let material = SCNMaterial()
     material.diffuse.contents = color
@@ -27,7 +21,6 @@ func makeMeshMaterial(color: UIColor) -> SCNMaterial {
     material.shininess = 0.8
     material.roughness.contents = 0.2
     material.metalness.contents = 0.1
-//    material.ambientOcclusion.contents = UIColor.black
     material.isDoubleSided = false
     return material
 }
@@ -67,7 +60,6 @@ private let planeMaterial: SCNMaterial = {
     material.fillMode = .fill
     return material
 }()
-
 
 final class ViewController: UIViewController, ARSCNViewDelegate, ARSessionDelegate {
     
@@ -152,6 +144,7 @@ final class ViewController: UIViewController, ARSCNViewDelegate, ARSessionDelega
         return view
     }()
 
+    #warning("TODO: Move all the interesting things into AppDelegate or some other ")
     private let agent = CurrentValueSubject<Agent?, Never>(nil)
     
     private let goal = CurrentValueSubject<Goal?, Never>(nil)

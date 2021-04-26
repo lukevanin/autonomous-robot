@@ -6,16 +6,17 @@
 //
 
 import Foundation
+import Combine
 import CoreGraphics
 import CoreImage
 import CoreImage.CIFilterBuiltins
 import simd
 
+
 private let mapFade = Float(0.1)
 private let roofThreshold = Float(1.800)
 private let floorVariance = Float(0.063)
-//private let outputMapResolution = Float(0.050)
-//private let outputMapScale = 1 / outputMapResolution
+
 
 final class MapBuilder {
     

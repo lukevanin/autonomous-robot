@@ -8,6 +8,10 @@
 import Foundation
 
 
+///
+/// Mutex implemented using `pthread_mutex_lock` and `pthread_mutex_unlock`. Used for
+/// obtaining an exclusive lock on a shared resource used by multiple threads.
+///
 public class PThreadMutex {
     var mutex: pthread_mutex_t = pthread_mutex_t()
    

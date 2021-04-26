@@ -11,6 +11,10 @@ import CoreGraphics
 import Combine
 
 
+///
+/// Draws a representation of the state of the world including the generated map, agent's position, current
+/// goal, waypoints, and trajectory. The rendering is used for visualizing the internal workings of the program.
+///
 final class Renderer: ObservableObject {
 
     struct Scene {
@@ -34,9 +38,6 @@ final class Renderer: ObservableObject {
         
         init(scene: Scene, ciContext: CIContext) {
             self.scene = scene
-//            let width = 50 * cellRadius * 2
-//            let height = 50 * cellRadius * 2
-//            self.agentRadius = CGFloat((scene.agent?.radius ?? 0) / scene.map.space.scale)
             let width = CGFloat(scene.map.dimensions.x) * cellRadius * 2
             let height = CGFloat(scene.map.dimensions.y) * cellRadius * 2
             self.width = Int(width)
@@ -46,10 +47,6 @@ final class Renderer: ObservableObject {
                 y: height * 0.5
             )
             self.ciContext = ciContext
-//            self.mapToViewTransform = CGAffineTransform
-//                .identity
-//                .translatedBy(x: 0, y: -height)
-//                .scaledBy(x: cellRadius * 2, y: -cellRadius * 2)
             self.mapToViewTransform = CGAffineTransform
                 .identity
                 .translatedBy(x: 0, y: height)
@@ -108,19 +105,6 @@ final class Renderer: ObservableObject {
             // Map
             if let mapImage = scene.map.cgImage() {
                 context.saveGState()
-
-//                let mapSize = CGSize(
-//                    width: CGFloat(scene.map.dimensions.x) * cellRadius * 2,
-//                    height: CGFloat(scene.map.dimensions.y) * cellRadius * 2
-//                )
-//                let mapOrigin = CGPoint(
-//                    x: (CGFloat(width) * 0.5) - (mapSize.width * 0.5),
-//                    y: (CGFloat(height) * 0.5) - (mapSize.height * 0.5)
-//                )
-//                let mapRect = CGRect(
-//                    origin: mapOrigin,
-//                    size: mapSize
-//                )
                 let mapSize = CGSize(
                     width: width,
                     height: height
@@ -138,8 +122,6 @@ final class Renderer: ObservableObject {
             }
             
             context.setBlendMode(.normal)
-//            context.scaleBy(x: 1, y: -1)
-//            context.translateBy(x: 0, y: -CGFloat(height))
             
             // Origin
             let zp = convert(WorldCoordinate(x: 0, y: 0))
@@ -229,10 +211,11 @@ final class Renderer: ObservableObject {
             
             // Rotate map
             let mapImage = context.makeImage()!
-            let ciInputImage = CIImage(cgImage: mapImage)
-            let ciOutputImage = ciInputImage.oriented(CGImagePropertyOrientation.left)
-            let outputImage = ciContext.createCGImage(ciOutputImage, from: ciOutputImage.extent)
-            return outputImage
+            return mapImage
+//            let ciInputImage = CIImage(cgImage: mapImage)
+//            let ciOutputImage = ciInputImage.oriented(CGImagePropertyOrientation.left)
+//            let outputImage = ciContext.createCGImage(ciOutputImage, from: ciOutputImage.extent)
+//            return outputImage
         }
         
         private func convert(_ coordinate: WorldCoordinate) -> CGPoint {
@@ -280,20 +263,6 @@ final class Renderer: ObservableObject {
                 self.update()
             }
             .store(in: &cancellables)
-//        scene
-//            .throttle(for: 0.1, scheduler: queue, latest: true)
-////            .debounce(for: 0.1, scheduler: queue)
-////            .receive(on: queue)
-//            .map { scene -> CGImage? in
-//                guard let scene = scene else {
-//                    return nil
-//                }
-//                let renderer = ImageRenderer(
-//                    scene: scene
-//                )
-//                return renderer.render()
-//            }
-//            .assign(to: &$image)
     }
     
     private func update() {

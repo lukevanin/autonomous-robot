@@ -102,7 +102,21 @@ The robot may fail to find a path on the map even where one exists in the physic
 
 This may be due to insufficient detail captured through scanning, or it may be a result of inaccurate tracking leading to deformations in the map. These two issues can often be resolved by re-scanning the affected area, reducing interference, or improving lighting.
 
-The robot may also fail to find a path trhough a region if there is insufficient  space between obstacles. Ensure there is at least one meter or more of open space between obstacles. 
+The robot may also fail to find a path trhough a region if there is insufficient  space between obstacles. Ensure there is at least one meter or more of open space between obstacles.
+
+## Code
+
+TODO: Document architecture
+
+## Future 
+
+Sundry list of ideas for further experimentation.
+
+- Render the heightmap in hardware (instead of using the Field / Blob software renderer).
+- Use planes detected by ARKit for producing the occupancy grid. Note that planes may extend through and under obstacles so this may require additional online obstacle avoidance measures.
+- Use ARFrame depth buffer for obstacle detection and avoidence while moving. 
+- Use front-facing camera for depth while using rear-facing camera for world tracking, on lower-end devices (iPhoneX).
+- Use image recognition for estimating location. Use depth map only for collision avoidance.
 
 ## License
 

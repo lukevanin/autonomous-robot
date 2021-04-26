@@ -7,7 +7,6 @@
 
 import Foundation
 
-
 struct Volume {
     static let undefined = Volume(
         min: SIMD3(

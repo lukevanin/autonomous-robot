@@ -10,6 +10,10 @@ import simd
 import Combine
 
 
+///
+/// Computes the path from the robot's position to the given goal. Provides updates whenever the robot's
+/// position or orientation changes, or when the map or goal changes.
+///
 final class Router: ObservableObject {
         
     struct Constraint {
@@ -37,8 +41,7 @@ final class Router: ObservableObject {
     ) {
         Publishers
             .CombineLatest3(agent, map, goal)
-            .throttle(for: 0.100, scheduler: queue, latest: true)
-//            .receive(on: queue)
+            .throttle(for: .seconds(routeUpdateInterval), scheduler: queue, latest: true)
             .map { (agent, map, goal) -> Route? in
                 guard let goal = goal else {
                     return nil

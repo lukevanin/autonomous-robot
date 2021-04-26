@@ -115,7 +115,6 @@ final class WorldPathFinder {
         guard roughPath.count > 0 else {
             return []
         }
-//        let waypoints = makeWaypoints(path: roughPath)
         let smoothedPath = smoothPath(source: mapSource, path: roughPath)
         let waypoints = smoothedPath.map { map.space.toWorld($0) }
         guard waypoints.count > 1 else {
@@ -144,6 +143,10 @@ final class WorldPathFinder {
         return output
     }
 
+    ///
+    /// Convert the points in map coordinates, to a list of waypoints in physical world coordinates.
+    /// Waypoints are placed only at corners where the path changes direction.
+    ///
     private func makeWaypoints(path points: [MapCoordinate]) -> [WorldCoordinate] {
         var waypoints = [WorldCoordinate]()
 

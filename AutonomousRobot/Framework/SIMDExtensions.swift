@@ -9,8 +9,34 @@ import Foundation
 import simd
 
 
-extension Float {
+extension simd_float2 {
     
+    ///
+    /// Computes the relative angle between two given angles, where both angles and the output are given
+    /// in radians.
+    ///
+    /// See: https://stackoverflow.com/a/21486462
+    ///
+    func angle(to other: simd_float2) -> Float {
+//        let a = simd_normalize(
+//            simd_float2(
+//                cos(self),
+//                sin(self)
+//            )
+//        )
+//        let b = simd_normalize(
+//            simd_float2(
+//                other,
+//                other
+//            )
+//        )
+        let a = simd_normalize(self)
+        let b = simd_normalize(other)
+        let cross = simd_orient(a, b)
+        let dot = simd_dot(a, b)
+        let angle = atan2(cross, dot)
+        return angle
+    }
 }
 
 

@@ -8,6 +8,9 @@
 import Foundation
 
 
+///
+/// PID control (actually currently a PI control).
+///
 struct PID {
     let kp: Float
     let ki: Float

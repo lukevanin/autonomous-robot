@@ -9,11 +9,6 @@ import ARKit
 import Combine
 
 
-private let initialDelay = TimeInterval(0.200)
-private let delayDecrement = TimeInterval(0.050)
-private let delayThreshold = TimeInterval(0.050)
-
-
 typealias Fields = [UUID : Field]
 
 
@@ -81,6 +76,9 @@ private final class WorkingState: AnyState {
 }
 
 
+///
+/// Converts mesh anchors provided by ARKit to a`Field` array, used for rending the map.
+///
 final class Scanner {
     
     let fields = CurrentValueSubject<Fields, Never>([:])
